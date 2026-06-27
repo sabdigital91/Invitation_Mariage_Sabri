@@ -210,23 +210,30 @@ body{
   text-align:center;position:relative;overflow:hidden;
 }
 
-.defiler-texte {
-  color: #ffffff;             /* Couleur blanche */
-  font-size: 0.8rem;          /* Petite taille de police */
-  letter-spacing: 1px;        /* Un léger espace entre les lettres pour l'élégance */
-  text-transform: uppercase;  /* Optionnel : en majuscules pour le style */
+.fleche-defiler {
+  position: absolute;
+  bottom: 30px;            /* Place la flèche à 30px du bas de la section */
+  left: 50%;
+  transform: translateX(-50%); /* Centre parfait à l'écran */
   
-  /* Configuration de l'animation : 2.5 secondes, en boucle et fluide */
-  animation: clignotementDoux 2.5s ease-in-out infinite; 
+  /* Style de la flèche */
+  color: transparent;
+  font-size: 50px;         /* Taille de la flèche ajustable selon vos goûts */
+  font-family: sans-serif; /* Pour garder une flèche fine et moderne */
+  
+  /* Animation de clignotement flouté */
+  animation: clignotementFlou 2.5s ease-in-out infinite; 
 }
 
-/* Définition de l'animation fluide (opacité) */
-@keyframes clignotementDoux {
+/* L'animation fluide avec l'effet de flou (blur) */
+@keyframes clignotementFlou {
   0%, 100% {
-    opacity: 0.3; /* Presque transparent au point bas */
+    opacity: 0.3;
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.8); /* Flou artistique blanc */
   }
   50% {
-    opacity: 1;   /* Totalement opaque au point haut */
+    opacity: 0.8;
+    text-shadow: 0 0 0px var(--gold, 0.8);                  /* Flèche nette et blanche */
   }
 }
 
@@ -382,7 +389,6 @@ body{
 
 /* Map button */
 .mapbtn{
-
   display:inline-flex;align-items:center;gap:7px;
   margin-top:clamp(16px,3.5vh,24px);
   padding:clamp(10px,2.3vh,13px) clamp(20px,5vw,28px);
@@ -534,6 +540,30 @@ body{
 .music-btn:active{transform:scale(.92)}
 .music-btn.on{background:var(--gold);color:var(--night);border-color:transparent}
 
+/* ─────────────────────────────────────────────
+   SCROLL REVEAL
+───────────────────────────────────────────── */
+.reveal{
+  opacity:0;transform:translateY(30px);
+  transition:opacity .8s ease,transform .8s ease;
+  will-change:opacity,transform;
+}
+.reveal.in{opacity:1;transform:none}
+
+/* spacer */
+.sp{height:clamp(6px,1.8vw,12px)}
+
+/* safe area support */
+@supports(padding:max(0px)){
+  .hero{
+    padding-top:max(64px,env(safe-area-inset-top,64px));
+    padding-bottom:max(40px,env(safe-area-inset-bottom,40px));
+  }
+  .music-btn{
+    bottom:max(14px,calc(env(safe-area-inset-bottom,0px) + 14px));
+    right:max(14px,env(safe-area-inset-right,14px));
+  }
+}
 </style>
 </head>
 <body>
@@ -587,7 +617,7 @@ body{
     <h1 class="hero-names">Sabri<span class="amp">&amp;</span>Maissa</h1>
     <p class="hero-date">0 5 · 0 8 · 2 0 2 6</p>
     <div class="hero-rule"></div>
-    <p class="defiler-texte">Faites défiler</p>
+    <div class="fleche-defiler">↓</div>
   </section>
 
   <!-- ── COUNTDOWN ── -->
@@ -792,7 +822,6 @@ body{
   </div>
   <div class="sp"></div>
 
-
   <!-- ── FOOTER ── -->
   <footer class="footer">
     <p class="footer-names">Sabri &amp; Maissa</p>
@@ -800,7 +829,7 @@ body{
     <p class="footer-venue">Salle des Fêtes El Hana</p>
   </footer>
 
-</div>
+</div><!-- /main-page -->
 
 
 <!-- MUSIQUE : remplacez src par lien MP3 direct -->
@@ -870,7 +899,37 @@ function initReveal(){
   document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 }
 
+/* ══ CAROUSEL ══ */
+function startCarousel(){
+  const track  = document.getElementById('cTrack');
+  const dots   = document.querySelectorAll('.dot');
+  const total  = 4;
+  let current  = 0;
+  let autoT;
 
+  function goTo(i){
+    current = (i+total)%total;
+    track.style.transform=`translateX(-${current*100}%)`;
+    dots.forEach((d,idx)=>d.classList.toggle('active',idx===current));
+  }
+
+  function startAuto(){
+    clearInterval(autoT);
+    autoT=setInterval(()=>goTo(current+1),3800);
+  }
+
+  dots.forEach(d=>d.addEventListener('click',()=>{goTo(+d.dataset.i);startAuto();}));
+
+  /* touch swipe */
+  let tx=0;
+  track.addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+  track.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>40){goTo(dx<0?current+1:current-1);startAuto();}
+  },{passive:true});
+
+  goTo(0);startAuto();
+}
 
 /* ══ MUSIC ══ */
 const mBtn=document.getElementById('musicBtn');
