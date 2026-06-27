@@ -210,6 +210,26 @@ body{
   text-align:center;position:relative;overflow:hidden;
 }
 
+.defiler-texte {
+  color: #ffffff;             /* Couleur blanche */
+  font-size: 0.8rem;          /* Petite taille de police */
+  letter-spacing: 1px;        /* Un léger espace entre les lettres pour l'élégance */
+  text-transform: uppercase;  /* Optionnel : en majuscules pour le style */
+  
+  /* Configuration de l'animation : 2.5 secondes, en boucle et fluide */
+  animation: clignotementDoux 2.5s ease-in-out infinite; 
+}
+
+/* Définition de l'animation fluide (opacité) */
+@keyframes clignotementDoux {
+  0%, 100% {
+    opacity: 0.3; /* Presque transparent au point bas */
+  }
+  50% {
+    opacity: 1;   /* Totalement opaque au point haut */
+  }
+}
+
 /* Floating rings & bouquets */
 .floater{
   position:absolute;
@@ -567,6 +587,7 @@ body{
     <h1 class="hero-names">Sabri<span class="amp">&amp;</span>Maissa</h1>
     <p class="hero-date">0 5 · 0 8 · 2 0 2 6</p>
     <div class="hero-rule"></div>
+    <p class="defiler-texte">Faites défiler</p>
   </section>
 
   <!-- ── COUNTDOWN ── -->
